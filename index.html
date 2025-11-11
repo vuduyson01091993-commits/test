@@ -5,83 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quản lý mượn thiết bị</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f8f9fa;
-  margin: 0;
-  padding: 20px;
-}
-h1 {
-  color: #ff6600;
-  margin-bottom: 20px;
-}
-.container {
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-input, select, button {
-  margin: 5px 0;
-  padding: 8px;
-  width: 100%;
-}
-button {
-  background: #ff6600;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-button:hover {
-  background: #e65c00;
-}
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.table th, .table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-.table th {
-  background: #007bff;
-  color: white;
-}
-.status-approved {
-  color: green;
-  font-weight: bold;
-}
-.status-pending {
-  color: orange;
-}
-.status-rejected {
-  color: red;
-}
-.approve-btn {
-  background: #28a745;
-}
-.reject-btn {
-  background: #dc3545;
-}
-.note {
-  font-size: 0.9em;
-  color: #666;
-}
+body {font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px;}
+h1 {color: #ff6600; margin-bottom: 20px;}
+.container {display: flex; gap: 40px; flex-wrap: wrap;}
+.card {background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+input, select, button {margin: 5px 0; padding: 8px; width: 100%;}
+button {background: #ff6600; color: white; border: none; border-radius: 5px; cursor: pointer;}
+button:hover {background: #e65c00;}
+.table {width: 100%; border-collapse: collapse;}
+.table th, .table td {border: 1px solid #ddd; padding: 8px; text-align: left;}
+.table th {background: #007bff; color: white;}
+.status-approved {color: green; font-weight: bold;}
+.status-pending {color: orange;}
+.status-rejected {color: red;}
+.approve-btn {background: #28a745;}
+.reject-btn {background: #dc3545;}
+.note {font-size: 0.9em; color: #666;}
+#adminPanel {display: none;}
 </style>
 </head>
 <body>
 
 <h1>📋 Quản lý mượn thiết bị</h1>
-<div class="container">
 
-  <!-- Form đăng ký mượn -->
+<!-- Form đăng ký mượn -->
+<div class="container">
   <div class="card" style="flex:1; min-width:300px;">
     <h2>Đăng ký mượn thiết bị</h2>
     <label>Tên người mượn:</label>
@@ -108,8 +56,8 @@ button:hover {
     <button onclick="addRequest()">Gửi yêu cầu</button>
   </div>
 
-  <!-- Bảng quản lý -->
-  <div class="card" style="flex:2; min-width:400px;">
+  <!-- Bảng quản lý (ẩn với người dùng thường) -->
+  <div id="adminPanel" class="card" style="flex:2; min-width:400px;">
     <h2>Danh sách yêu cầu mượn</h2>
     <table class="table" id="requestTable">
       <thead>
@@ -125,9 +73,15 @@ button:hover {
       </thead>
       <tbody></tbody>
     </table>
-    <p class="note">* Chỉ quản lý mới được duyệt hoặc từ chối yêu cầu.</p>
+    <p class="note">* Chỉ quản trị viên mới có quyền duyệt hoặc từ chối yêu cầu.</p>
   </div>
+</div>
 
+<!-- Form đăng nhập quản trị viên -->
+<div id="adminLogin" class="card" style="margin-top:20px; max-width:400px;">
+  <h3>🔒 Đăng nhập quản trị viên</h3>
+  <input id="adminPass" type="password" placeholder="Nhập mật khẩu quản trị">
+  <button onclick="loginAdmin()">Đăng nhập</button>
 </div>
 
 <script>
@@ -197,6 +151,19 @@ function reject(i) {
   requests[i].status = "Từ chối ❌";
   saveData();
   renderTable();
+}
+
+// ---- QUẢN TRỊ VIÊN ----
+function loginAdmin() {
+  const pass = document.getElementById("adminPass").value;
+  const correctPass = "FICD2025"; // 🔐 đổi mật khẩu ở đây
+  if (pass === correctPass) {
+    document.getElementById("adminPanel").style.display = "block";
+    document.getElementById("adminLogin").style.display = "none";
+    alert("Đăng nhập thành công!");
+  } else {
+    alert("Sai mật khẩu quản trị!");
+  }
 }
 
 renderTable();
