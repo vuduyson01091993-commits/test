@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý mượn thiết bị</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  margin: 0;
+  padding: 20px;
+}
+h1 {
+  color: #ff6600;
+  margin-bottom: 20px;
+}
+.container {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+input, select, button {
+  margin: 5px 0;
+  padding: 8px;
+  width: 100%;
+}
+button {
+  background: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background: #e65c00;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.table th {
+  background: #007bff;
+  color: white;
+}
+.status-approved {
+  color: green;
+  font-weight: bold;
+}
+.status-pending {
+  color: orange;
+}
+.status-rejected {
+  color: red;
+}
+.approve-btn {
+  background: #28a745;
+}
+.reject-btn {
+  background: #dc3545;
+}
+.note {
+  font-size: 0.9em;
+  color: #666;
+}
+</style>
+</head>
+<body>
+
+<h1>📋 Quản lý mượn thiết bị</h1>
+<div class="container">
+
+  <!-- Form đăng ký mượn -->
+  <div class="card" style="flex:1; min-width:300px;">
+    <h2>Đăng ký mượn thiết bị</h2>
+    <label>Tên người mượn:</label>
+    <input id="borrower" type="text" placeholder="Nhập họ tên">
+
+    <label>Chọn thiết bị:</label>
+    <select id="device">
+      <option value="Laptop Dell">Laptop Dell</option>
+      <option value="Máy chiếu Epson">Máy chiếu Epson</option>
+      <option value="Micro không dây">Micro không dây</option>
+      <option value="iPad">iPad</option>
+      <option value="Camera Sony">Camera Sony</option>
+    </select>
+
+    <label>Ngày mượn:</label>
+    <input id="borrowDate" type="date">
+
+    <label>Thời gian mượn:</label>
+    <input id="borrowTime" type="time">
+
+    <label>Ngày trả dự kiến:</label>
+    <input id="returnDate" type="date">
+
+    <button onclick="addRequest()">Gửi yêu cầu</button>
+  </div>
+
+  <!-- Bảng quản lý -->
+  <div class="card" style="flex:2; min-width:400px;">
+    <h2>Danh sách yêu cầu mượn</h2>
+    <table class="table" id="requestTable">
+      <thead>
+        <tr>
+          <th>Người mượn</th>
+          <th>Thiết bị</th>
+          <th>Ngày mượn</th>
+          <th>Thời gian</th>
+          <th>Ngày trả</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p class="note">* Chỉ quản lý mới được duyệt hoặc từ chối yêu cầu.</p>
+  </div>
+
+</div>
+
+<script>
+let requests = JSON.parse(localStorage.getItem("requests")) || [];
+
+function saveData() {
+  localStorage.setItem("requests", JSON.stringify(requests));
+}
+
+function renderTable() {
+  const tbody = document.querySelector("#requestTable tbody");
+  tbody.innerHTML = "";
+  requests.forEach((r, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.borrower}</td>
+        <td>${r.device}</td>
+        <td>${r.borrowDate}</td>
+        <td>${r.borrowTime}</td>
+        <td>${r.returnDate}</td>
+        <td class="${r.status === 'Đã duyệt ✅' ? 'status-approved' :
+                    r.status === 'Từ chối ❌' ? 'status-rejected' : 'status-pending'}">
+          ${r.status}
+        </td>
+        <td>
+          ${r.status === "Chờ duyệt" ? `
+            <button class="approve-btn" onclick="approve(${i})">Duyệt</button>
+            <button class="reject-btn" onclick="reject(${i})">Từ chối</button>
+          ` : ""}
+        </td>
+      </tr>`;
+  });
+}
+
+function addRequest() {
+  const borrower = document.getElementById("borrower").value.trim();
+  const device = document.getElementById("device").value;
+  const borrowDate = document.getElementById("borrowDate").value;
+  const borrowTime = document.getElementById("borrowTime").value;
+  const returnDate = document.getElementById("returnDate").value;
+
+  if (!borrower || !borrowDate || !borrowTime || !returnDate) {
+    alert("Vui lòng nhập đầy đủ thông tin!");
+    return;
+  }
+
+  requests.push({
+    borrower,
+    device,
+    borrowDate,
+    borrowTime,
+    returnDate,
+    status: "Chờ duyệt"
+  });
+  saveData();
+  renderTable();
+  alert("Đã gửi yêu cầu mượn thiết bị!");
+}
+
+function approve(i) {
+  requests[i].status = "Đã duyệt ✅";
+  saveData();
+  renderTable();
+}
+
+function reject(i) {
+  requests[i].status = "Từ chối ❌";
+  saveData();
+  renderTable();
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
